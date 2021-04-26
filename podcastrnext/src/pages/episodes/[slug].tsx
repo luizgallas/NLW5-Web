@@ -44,10 +44,24 @@ export default function Episode({ episode }) {
 }
 
 export const getStaticPaths : GetStaticPaths = async() => {
+    const { data } = await api.get('episodes', {
+        params: {
+            _limit: 2,
+            _sort: 'published_at',
+            _order: 'desc'
+        }
+    })
+
+    const paths = data.map(episode => {
+        return {
+            params: { slug: episode.id }
+        }
+    })
+
     return {
-        paths: [],
-        fallback: 'blocking'
-    }
+        paths: paths, // Vazio = não gera nenhum estático.
+        fallback: 'blocking' // Determina o comportamento da aplicação ao acessar uma página de um episódio que não foi gerado estáticamente
+    } // Incremental static regeneration
 }
 
 export const getStaticProps: GetStaticProps = async(context) => {
